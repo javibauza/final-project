@@ -6,8 +6,8 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 
-	erro "github.com/javibauza/final-project/gbfp-httpservice/errors"
-	"github.com/javibauza/final-project/gbfp-httpservice/repository"
+	erro "github.com/javibauza/final-project/rest-service/errors"
+	"github.com/javibauza/final-project/rest-service/repository"
 )
 
 type Service interface {

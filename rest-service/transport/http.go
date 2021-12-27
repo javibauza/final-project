@@ -9,8 +9,8 @@ import (
 	"github.com/gorilla/mux"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/javibauza/final-project/gbfp-httpservice/endpoints"
-	erro "github.com/javibauza/final-project/gbfp-httpservice/errors"
+	"github.com/javibauza/final-project/rest-service/endpoints"
+	erro "github.com/javibauza/final-project/rest-service/errors"
 )
 
 type ErrorResponse struct {

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	erro "github.com/javibauza/final-project/gbfp-httpservice/errors"
-	"github.com/javibauza/final-project/gbfp-httpservice/repository"
-	"github.com/javibauza/final-project/gbfp-httpservice/utils"
+	erro "github.com/javibauza/final-project/rest-service/errors"
+	"github.com/javibauza/final-project/rest-service/repository"
+	"github.com/javibauza/final-project/rest-service/utils"
 )
 
 type repoMock struct {
