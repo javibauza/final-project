@@ -8,9 +8,9 @@ import (
 	"github.com/go-kit/log/level"
 	"google.golang.org/grpc"
 
-	"../github.com/javibauza/final-project/grpc-service/pb"
+	"github.com/javibauza/final-project/grpc-service/pb"
 
-	erro "github.com/javibauza/final-project/gbfp-httpservice/errors"
+	erro "github.com/javibauza/final-project/rest-service/errors"
 )
 
 type UserRepo struct {

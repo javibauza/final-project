@@ -39,7 +39,7 @@ func main() {
 	{
 		var err error
 
-		db, err = sql.Open("sqlite3", "./../users.db")
+		db, err = sql.Open("sqlite3", "./users.db")
 		if err != nil {
 			level.Error(logger).Log("exit", err)
 			os.Exit(-1)

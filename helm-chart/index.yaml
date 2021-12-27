@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  final-project-chart:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2021-12-27T09:07:25.972623041-03:00"
+    description: The Final Proyect Helm chart for Kubernetes
+    digest: 179662440625685605473db05bc7c74934d1bb4acb7313f7c2a8a16c504cea2f
+    name: final-project-chart
+    type: application
+    urls:
+    - final-project-chart-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-12-27T09:07:25.972142017-03:00"

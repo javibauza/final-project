@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-rest-service-deployment
+  labels:
+    app: user-rest-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-rest-service
+  template:
+    metadata:
+      labels:
+        app: user-rest-service
+    spec:
+      containers:
+        - name: user-rest-service
+          image: user-rest-service
+          imagePullPolicy: Never
+          env:
+          - name: ENV
+            value: "cluster"
+---
+apiVersion: v1
+kind: Service          
+
+metadata:
+  name: user-rest-service-service
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: user-rest-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-grpc-service-deployment
+  labels:
+    app: user-grpc-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-grpc-service
+  template:
+    metadata:
+      labels:
+        app: user-grpc-service
+    spec:
+      containers:
+        - name: user-grpc-service
+          image: user-grpc-service
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service          
+
+metadata:
+  name: user-grpc-service-service
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: user-grpc-service
+  ports:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051
+---

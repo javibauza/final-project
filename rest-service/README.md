@@ -1,1 +1,1 @@
-# gbfp-httpservice
+# rest-service

@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/javibauza/final-project/gbfp-httpservice/service"
+	"github.com/javibauza/final-project/rest-service/service"
 
-	erro "github.com/javibauza/final-project/gbfp-httpservice/errors"
+	erro "github.com/javibauza/final-project/rest-service/errors"
 )
 
 type Endpoints struct {

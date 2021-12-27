@@ -12,16 +12,24 @@ import (
 	"github.com/go-kit/log/level"
 	"google.golang.org/grpc"
 
-	"github.com/javibauza/final-project/gbfp-httpservice/endpoints"
-	"github.com/javibauza/final-project/gbfp-httpservice/repository"
-	"github.com/javibauza/final-project/gbfp-httpservice/service"
-	"github.com/javibauza/final-project/gbfp-httpservice/transport"
+	"github.com/javibauza/final-project/rest-service/endpoints"
+	"github.com/javibauza/final-project/rest-service/repository"
+	"github.com/javibauza/final-project/rest-service/service"
+	"github.com/javibauza/final-project/rest-service/transport"
 )
 
 func main() {
-	var (
+	var grpcUserServiceAddr *string
+
+	env := os.Getenv("ENV")
+	if env == "cluster" {
+		grpcUserServiceAddr = flag.String("addr", "user-grpc-service-service.default.svc.cluster.local:50051", "The gprcUserServer address in the format of host:port")
+	} else {
 		grpcUserServiceAddr = flag.String("addr", "localhost:50051", "The gprcUserServer address in the format of host:port")
-		httpAddr            = flag.String("http", ":8080", "http listen address")
+	}
+
+	var (
+		httpAddr = flag.String("http", ":8080", "http listen address")
 	)
 	var logger log.Logger
 	{

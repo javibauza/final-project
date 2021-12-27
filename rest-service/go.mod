@@ -1,20 +1,14 @@
-module github.com/javibauza/final-project/gbfp-httpservice
+module github.com/javibauza/final-project/rest-service
 
 go 1.17
 
 require (
 	github.com/go-kit/kit v0.12.0
-	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
-	google.golang.org/grpc v1.42.0
-)
-
-require github.com/gorilla/mux v1.8.0
-
-require github.com/javibauza/gbfp-grpcuserservice v0.0.0-20211221135231-4348be6b0f47
-
-require (
 	github.com/go-kit/log v0.2.0
+	github.com/gorilla/mux v1.8.0
+	github.com/javibauza/final-project/grpc-service v0.0.0-20211223193657-e9a9ab92c2e9
 	github.com/stretchr/testify v1.7.0
+	google.golang.org/grpc v1.43.0
 )
 
 require (

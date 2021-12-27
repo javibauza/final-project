@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/javibauza/final-project/grpc-service/pb"
-	"github.com/javibauza/grpc-service/utils"
+	"github.com/javibauza/final-project/rest-service/utils"
 )
 
 type mockGRPCService struct {
