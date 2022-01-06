@@ -12,11 +12,12 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/javibauza/final-project/grpc-service/entities"
 	erro "github.com/javibauza/final-project/grpc-service/errors"
 	"github.com/javibauza/final-project/grpc-service/utils"
 )
 
-var user = &User{
+var user = &entities.User{
 	Id:      001,
 	UserId:  utils.RandomString(12),
 	PwdHash: "$2a$12$Lhdc.gbeLbQbm8uz3H1T4.EPaxqclyblPeM1N1rxhNCth1/sZkCwC", //jbauza123
@@ -56,7 +57,7 @@ func TestAuthenticate(t *testing.T) {
 		testName      string
 		userName      string
 		buildStubs    func(mock sqlmock.Sqlmock, userName string)
-		checkResponse func(t *testing.T, response User, resError error)
+		checkResponse func(t *testing.T, response entities.User, resError error)
 	}{
 		{
 			testName: "user authenticated",
@@ -66,7 +67,7 @@ func TestAuthenticate(t *testing.T) {
 				mock.ExpectPrepare(authenticateSQL)
 				mock.ExpectQuery(authenticateSQL).WithArgs(userName).WillReturnRows(rows)
 			},
-			checkResponse: func(t *testing.T, response User, resError error) {
+			checkResponse: func(t *testing.T, response entities.User, resError error) {
 				assert.NoError(t, resError)
 			},
 		},
@@ -78,7 +79,7 @@ func TestAuthenticate(t *testing.T) {
 				mock.ExpectPrepare(authenticateSQL)
 				mock.ExpectQuery(authenticateSQL).WithArgs(userName).WillReturnRows(rows)
 			},
-			checkResponse: func(t *testing.T, response User, resError error) {
+			checkResponse: func(t *testing.T, response entities.User, resError error) {
 				assert.Empty(t, response)
 				assert.EqualError(t, resError, erro.ErrUserNotFound)
 			},
@@ -117,20 +118,20 @@ func TestCreateUser(t *testing.T) {
 
 	testCases := []struct {
 		testName      string
-		userData      *User
-		buildStubs    func(mock sqlmock.Sqlmock, user *User)
+		userData      *entities.User
+		buildStubs    func(mock sqlmock.Sqlmock, user *entities.User)
 		checkResponse func(t *testing.T, err error)
 	}{
 		{
 			testName: "user created",
-			userData: &User{
+			userData: &entities.User{
 				UserId:  user.UserId,
 				PwdHash: user.PwdHash,
 				Name:    user.Name,
 				Age:     user.Age,
 				AddInfo: user.AddInfo,
 			},
-			buildStubs: func(mock sqlmock.Sqlmock, request *User) {
+			buildStubs: func(mock sqlmock.Sqlmock, request *entities.User) {
 				var lastInsertID, affected int64
 				mock.ExpectPrepare(createSQL)
 				mock.ExpectExec(createSQL).
@@ -150,7 +151,7 @@ func TestCreateUser(t *testing.T) {
 
 			tc.buildStubs(mock, tc.userData)
 
-			request := User{
+			request := entities.User{
 				UserId:  tc.userData.UserId,
 				PwdHash: tc.userData.PwdHash,
 				Name:    tc.userData.Name,
@@ -182,18 +183,18 @@ func TestUpdateUser(t *testing.T) {
 
 	testCases := []struct {
 		testName      string
-		userData      *User
-		buildStubs    func(mock sqlmock.Sqlmock, user *User)
+		userData      *entities.User
+		buildStubs    func(mock sqlmock.Sqlmock, user *entities.User)
 		checkResponse func(t *testing.T, resError error)
 	}{
 		{
 			testName: "user updated",
-			userData: &User{
+			userData: &entities.User{
 				PwdHash: user.PwdHash,
 				Name:    user.Name,
 				Age:     user.Age,
 			},
-			buildStubs: func(mock sqlmock.Sqlmock, user *User) {
+			buildStubs: func(mock sqlmock.Sqlmock, user *entities.User) {
 				_, query := updateSQL(user)
 				mock.ExpectPrepare(query)
 				mock.ExpectExec(query).
@@ -206,12 +207,12 @@ func TestUpdateUser(t *testing.T) {
 		},
 		{
 			testName: "user not found",
-			userData: &User{
+			userData: &entities.User{
 				Name:    user.Name,
 				PwdHash: user.PwdHash,
 				Age:     user.Age,
 			},
-			buildStubs: func(mock sqlmock.Sqlmock, user *User) {
+			buildStubs: func(mock sqlmock.Sqlmock, user *entities.User) {
 				_, query := updateSQL(user)
 				mock.ExpectPrepare(query)
 				mock.ExpectExec(query).
@@ -233,7 +234,7 @@ func TestUpdateUser(t *testing.T) {
 
 			tc.buildStubs(mock, tc.userData)
 
-			request := User{
+			request := entities.User{
 				UserId:  tc.userData.UserId,
 				Name:    tc.userData.Name,
 				PwdHash: tc.userData.PwdHash,
@@ -267,7 +268,7 @@ func TestGetUser(t *testing.T) {
 		testName      string
 		userId        string
 		buildStubs    func(mock sqlmock.Sqlmock, userId string)
-		checkResponse func(t *testing.T, response User, resError error)
+		checkResponse func(t *testing.T, response entities.User, resError error)
 	}{
 		{
 			testName: "user obtained",
@@ -281,7 +282,7 @@ func TestGetUser(t *testing.T) {
 					WithArgs(userId).
 					WillReturnRows(rows)
 			},
-			checkResponse: func(t *testing.T, response User, resError error) {
+			checkResponse: func(t *testing.T, response entities.User, resError error) {
 				assert.NoError(t, resError)
 			},
 		},
@@ -294,7 +295,7 @@ func TestGetUser(t *testing.T) {
 				mock.ExpectQuery(getSQL).
 					WithArgs(userId).WillReturnRows(rows)
 			},
-			checkResponse: func(t *testing.T, response User, resError error) {
+			checkResponse: func(t *testing.T, response entities.User, resError error) {
 				assert.Empty(t, response)
 				assert.EqualError(t, resError, erro.ErrUserNotFound)
 			},

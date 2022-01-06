@@ -7,6 +7,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 
+	"github.com/javibauza/final-project/grpc-service/entities"
 	erro "github.com/javibauza/final-project/grpc-service/errors"
 )
 
@@ -15,53 +16,37 @@ type SQLRepo struct {
 	logger log.Logger
 }
 
-type Repository interface {
-	Authenticate(ctx context.Context, userName string) (User, error)
-	CreateUser(ctx context.Context, user User) error
-	UpdateUser(ctx context.Context, user User) error
-	GetUser(ctx context.Context, userId string) (User, error)
-}
-
-type User struct {
-	Id      int
-	UserId  string
-	PwdHash string
-	Name    string
-	Age     uint32
-	AddInfo sql.NullString
-}
-
-func NewRepo(db *sql.DB, logger log.Logger) Repository {
+func NewRepo(db *sql.DB, logger log.Logger) *SQLRepo {
 	return &SQLRepo{
 		db:     db,
 		logger: log.With(logger, "error", "db"),
 	}
 }
 
-func (repo *SQLRepo) Authenticate(ctx context.Context, userName string) (User, error) {
+func (repo *SQLRepo) Authenticate(ctx context.Context, userName string) (entities.User, error) {
 	logger := log.With(repo.logger, "method", "Authenticate")
 
 	stmt, err := repo.db.Prepare(authenticateSQL)
 	if err != nil {
 		level.Error(logger).Log("err", err.Error())
-		return User{}, err
+		return entities.User{}, err
 	}
 
-	var user User
+	var user entities.User
 	err = stmt.QueryRow(userName).Scan(&user.UserId, &user.PwdHash)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			level.Error(logger).Log("err", erro.ErrUserNotFound)
-			return User{}, erro.NewErrNotFound()
+			return entities.User{}, erro.NewErrNotFound()
 		}
 		level.Error(logger).Log("err", err.Error())
-		return User{}, err
+		return entities.User{}, err
 	}
 
 	return user, nil
 }
 
-func (repo *SQLRepo) CreateUser(ctx context.Context, user User) error {
+func (repo *SQLRepo) CreateUser(ctx context.Context, user entities.User) error {
 	logger := log.With(repo.logger, "method", "CreateUser")
 
 	stmt, err := repo.db.Prepare(createSQL)
@@ -79,7 +64,7 @@ func (repo *SQLRepo) CreateUser(ctx context.Context, user User) error {
 	return nil
 }
 
-func (repo *SQLRepo) UpdateUser(ctx context.Context, user User) error {
+func (repo *SQLRepo) UpdateUser(ctx context.Context, user entities.User) error {
 	logger := log.With(repo.logger, "method", "UpdateUser")
 
 	args, query := updateSQL(&user)
@@ -108,24 +93,24 @@ func (repo *SQLRepo) UpdateUser(ctx context.Context, user User) error {
 	return nil
 }
 
-func (repo *SQLRepo) GetUser(ctx context.Context, userId string) (User, error) {
+func (repo *SQLRepo) GetUser(ctx context.Context, userId string) (entities.User, error) {
 	logger := log.With(repo.logger, "method", "GetUser")
 
 	stmt, err := repo.db.Prepare(getSQL)
 	if err != nil {
 		level.Error(logger).Log("err", err.Error())
-		return User{}, err
+		return entities.User{}, err
 	}
 
-	var user User
+	var user entities.User
 	err = stmt.QueryRow(userId).Scan(&user.UserId, &user.Name, &user.Age, &user.AddInfo)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			level.Error(logger).Log("err", erro.ErrUserNotFound, "userId", userId)
-			return User{}, erro.NewErrNotFound()
+			return entities.User{}, erro.NewErrNotFound()
 		}
 		level.Error(logger).Log("err", err.Error())
-		return User{}, err
+		return entities.User{}, err
 	}
 
 	return user, nil

@@ -1,0 +1,380 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Final Project",
+    "version": "2.0",
+    "contact": {
+      "name": "Golang Bootcamp Final Project",
+      "url": "https://github.com/javibauza/final-project",
+      "email": "javier.bauza@globant.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api": {
+      "post": {
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userCreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userCreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/auth": {
+      "post": {
+        "operationId": "UserService_Authenticate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userAuthenticateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userAuthenticateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/{userId}": {
+      "get": {
+        "operationId": "UserService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userGetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "description": "The ID of the User to be displayed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "put": {
+        "operationId": "UserService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "description": "The ID of the User to be updated.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "password": "drowssap",
+                "user_name": "myusername",
+                "user_age": 55,
+                "add_info": "Some interesting info"
+              },
+              "properties": {
+                "userName": {
+                  "type": "string",
+                  "description": "The new Name of the User."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The new Password of the User."
+                },
+                "userAge": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "The new Age of the User."
+                },
+                "addInfo": {
+                  "type": "string",
+                  "description": "The new Additional Info of the User."
+                }
+              },
+              "description": "Request to Update a User",
+              "title": "Update User Request",
+              "required": [
+                "user_id"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "userAuthenticateRequest": {
+      "type": "object",
+      "example": {
+        "password": "drowssap",
+        "user_name": "myusername"
+      },
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "The Password of the User."
+        },
+        "userName": {
+          "type": "string",
+          "description": "The Name of the User."
+        }
+      },
+      "description": "Request to Authenticate a User",
+      "title": "Authenticate Request",
+      "required": [
+        "password",
+        "userName"
+      ]
+    },
+    "userAuthenticateResponse": {
+      "type": "object",
+      "example": {
+        "user_id": "BpLnfgDsc3WD",
+        "status": {
+          "code": 0,
+          "message": "ok"
+        }
+      },
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "If the User exists, the ID of the User. Else, empty"
+        },
+        "status": {
+          "$ref": "#/definitions/userStatus",
+          "description": "The Status of the operation."
+        }
+      }
+    },
+    "userCreateUserRequest": {
+      "type": "object",
+      "example": {
+        "password": "drowssap",
+        "user_name": "myusername",
+        "user_age": 55,
+        "add_info": "Some interesting info"
+      },
+      "properties": {
+        "userName": {
+          "type": "string",
+          "description": "The Name of the User."
+        },
+        "password": {
+          "type": "string",
+          "description": "The Password of the User."
+        },
+        "userAge": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The Age of the User."
+        },
+        "addInfo": {
+          "type": "string",
+          "description": "Some Additional Info of the User."
+        }
+      },
+      "description": "Request to Create a User",
+      "title": "Create User Request",
+      "required": [
+        "userName",
+        "password"
+      ]
+    },
+    "userCreateUserResponse": {
+      "type": "object",
+      "example": {
+        "user_id": "BpLnfgDsc3WD",
+        "status": {
+          "code": 0,
+          "message": "ok"
+        }
+      },
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "If the User has been created, the ID of the created User. Else, empty"
+        },
+        "status": {
+          "$ref": "#/definitions/userStatus",
+          "description": "The Status of the operation."
+        }
+      }
+    },
+    "userGetUserResponse": {
+      "type": "object",
+      "example": {
+        "user_id": "BpLnfgDsc3WD",
+        "user_name": "myusername",
+        "user_age": 55,
+        "add_info": "Some interesting info",
+        "status": {
+          "code": 0,
+          "message": "ok"
+        }
+      },
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the User."
+        },
+        "userName": {
+          "type": "string",
+          "description": "The Name of the User."
+        },
+        "userAge": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The Age of the User."
+        },
+        "addInfo": {
+          "type": "string",
+          "description": "The Additional Info of the User."
+        },
+        "status": {
+          "$ref": "#/definitions/userStatus",
+          "description": "The Status of the operation."
+        }
+      }
+    },
+    "userStatus": {
+      "type": "object",
+      "example": {
+        "code": 0,
+        "message": "ok"
+      },
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "userUpdateUserResponse": {
+      "type": "object",
+      "example": {
+        "status": {
+          "code": 0,
+          "message": "ok"
+        }
+      },
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/userStatus",
+          "description": "The Status of the operation."
+        }
+      }
+    }
+  }
+}

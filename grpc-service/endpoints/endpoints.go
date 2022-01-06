@@ -2,12 +2,25 @@ package endpoints
 
 import (
 	"context"
+	"database/sql"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+
+	//"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 
+	"github.com/javibauza/final-project/grpc-service/entities"
 	erro "github.com/javibauza/final-project/grpc-service/errors"
-	"github.com/javibauza/final-project/grpc-service/service"
 )
+
+type Service interface {
+	Authenticate(ctx context.Context, req entities.User) (string, error)
+	CreateUser(ctx context.Context, req entities.User) (entities.User, error)
+	UpdateUser(ctx context.Context, req entities.User) error
+	GetUser(ctx context.Context, userId string) (entities.User, error)
+}
 
 type Endpoints struct {
 	Authenticate endpoint.Endpoint
@@ -54,27 +67,30 @@ type GetUserResponse struct {
 	AddInfo string
 }
 
-func MakeEndpoints(s service.Service) Endpoints {
+func MakeEndpoints(s Service, logger log.Logger) Endpoints {
 	return Endpoints{
-		Authenticate: makeAuthEndpoint(s),
-		CreateUser:   makeCreateUserEndpoint(s),
-		UpdateUser:   makeUpdateUserEndpoint(s),
-		GetUser:      makeGetUserEndpoint(s),
+		Authenticate: makeAuthEndpoint(s, logger),
+		CreateUser:   makeCreateUserEndpoint(s, logger),
+		UpdateUser:   makeUpdateUserEndpoint(s, logger),
+		GetUser:      makeGetUserEndpoint(s, logger),
 	}
 }
 
-func makeAuthEndpoint(s service.Service) endpoint.Endpoint {
+func makeAuthEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		logger := log.With(logger, "method", "makeAuthEndpoint")
 		req, ok := request.(AuthRequest)
 		if !ok {
+			level.Error(logger).Log("error", erro.ErrInvalidRequestType)
 			return AuthResponse{}, erro.NewErrInvalidArgument(erro.ErrInvalidRequestType)
 		}
 
-		userId, err := s.Authenticate(ctx, service.AuthRequest{
-			Name: req.Name,
-			Pwd:  req.Pwd,
+		userId, err := s.Authenticate(ctx, entities.User{
+			Name:     req.Name,
+			Password: req.Pwd,
 		})
 		if err != nil {
+			level.Error(logger).Log("error", err.Error())
 			return AuthResponse{}, err
 		}
 
@@ -84,20 +100,23 @@ func makeAuthEndpoint(s service.Service) endpoint.Endpoint {
 	}
 }
 
-func makeCreateUserEndpoint(s service.Service) endpoint.Endpoint {
+func makeCreateUserEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		logger := log.With(logger, "method", "makeCreateUserEndpoint")
 		req, ok := request.(CreateUserRequest)
 		if !ok {
+			level.Error(logger).Log("error", erro.ErrInvalidRequestType)
 			return CreateUserResponse{}, erro.NewErrInvalidArgument(erro.ErrInvalidRequestType)
 		}
 
-		res, err := s.CreateUser(ctx, service.CreateUserRequest{
-			Name:    req.Name,
-			Pwd:     req.Pwd,
-			Age:     req.Age,
-			AddInfo: req.AddInfo,
+		res, err := s.CreateUser(ctx, entities.User{
+			Name:     req.Name,
+			Password: req.Pwd,
+			Age:      req.Age,
+			AddInfo:  sql.NullString{String: req.AddInfo},
 		})
 		if err != nil {
+			level.Error(logger).Log("error", err.Error())
 			return CreateUserResponse{}, err
 		}
 
@@ -107,21 +126,24 @@ func makeCreateUserEndpoint(s service.Service) endpoint.Endpoint {
 	}
 }
 
-func makeUpdateUserEndpoint(s service.Service) endpoint.Endpoint {
+func makeUpdateUserEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		logger := log.With(logger, "method", "makeUpdateUserEndpoint")
 		req, ok := request.(UpdateUserRequest)
 		if !ok {
+			level.Error(logger).Log("error", erro.ErrInvalidRequestType)
 			return nil, erro.NewErrInvalidArgument(erro.ErrInvalidRequestType)
 		}
 
-		err := s.UpdateUser(ctx, service.UpdateUserRequest{
-			UserId:  req.UserId,
-			Name:    req.Name,
-			Pwd:     req.Pwd,
-			Age:     req.Age,
-			AddInfo: req.AddInfo,
+		err := s.UpdateUser(ctx, entities.User{
+			UserId:   req.UserId,
+			Name:     req.Name,
+			Password: req.Pwd,
+			Age:      req.Age,
+			AddInfo:  sql.NullString{String: req.AddInfo},
 		})
 		if err != nil {
+			level.Error(logger).Log("error", err.Error())
 			return nil, err
 		}
 
@@ -129,15 +151,18 @@ func makeUpdateUserEndpoint(s service.Service) endpoint.Endpoint {
 	}
 }
 
-func makeGetUserEndpoint(s service.Service) endpoint.Endpoint {
+func makeGetUserEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		logger := log.With(logger, "method", "makeGetUserEndpoint")
 		req, ok := request.(GetUserRequest)
 		if !ok {
+			level.Error(logger).Log("error", erro.ErrInvalidRequestType)
 			return nil, erro.NewErrInvalidArgument(erro.ErrInvalidRequestType)
 		}
 
 		user, err := s.GetUser(ctx, req.UserId)
 		if err != nil {
+			level.Error(logger).Log("error", err.Error())
 			return GetUserResponse{}, err
 		}
 
@@ -145,7 +170,7 @@ func makeGetUserEndpoint(s service.Service) endpoint.Endpoint {
 			UserId:  user.UserId,
 			Name:    user.Name,
 			Age:     user.Age,
-			AddInfo: user.AddInfo,
+			AddInfo: user.AddInfo.String,
 		}, nil
 	}
 }
