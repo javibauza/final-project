@@ -2,13 +2,15 @@ package repository
 
 import (
 	"strings"
+
+	"github.com/javibauza/final-project/grpc-service/entities"
 )
 
 const authenticateSQL = "SELECT user_id, pwd_hash FROM users WHERE name=?"
 const createSQL = "INSERT INTO users (user_id, name, pwd_hash, age, additional_information) VALUES (?, ?, ?, ?, ?)"
 const getSQL = "SELECT user_id, name, age, additional_information FROM users WHERE user_id=?"
 
-func updateSQL(user *User) (args []interface{}, query string) {
+func updateSQL(user *entities.User) (args []interface{}, query string) {
 	query = "UPDATE users"
 	queryArgs := " SET "
 

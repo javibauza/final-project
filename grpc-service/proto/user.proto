@@ -1,0 +1,149 @@
+syntax = "proto3";
+option go_package = "github.com/javibauza/final-project/grpc-service/proto";
+
+package user;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+	info: {
+		title: "Final Project";
+		version: "2.0";
+		contact: {
+			name: "Golang Bootcamp Final Project";
+			url: "https://github.com/javibauza/final-project";
+			email: "javier.bauza@globant.com";
+		};
+	};
+};
+
+service UserService {
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {
+        option (google.api.http) = {
+            post: "/api/auth"
+            body: "*"
+          };
+    }   
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/api"
+            body: "*"
+          };
+    }
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            put: "/api/{user.user_id}"
+            body: "user"
+          };
+    }
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/api/{user_id}"
+        };
+    }
+}
+
+message Status {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"code\": 0, \"message\": \"ok\"}"
+    };
+    int32 code = 1;
+    string message = 3;
+}
+
+message AuthenticateRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			title: "Authenticate Request"
+			description: "Request to Authenticate a User"
+			required: ["password", "user_name"]
+		}
+		example: "{\"password\": \"drowssap\", \"user_name\": \"myusername\"}"
+	};
+    string password = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Password of the User."}]; 
+    string user_name = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Name of the User."}]; 
+}
+
+message AuthenticateResponse {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"user_id\": \"BpLnfgDsc3WD\", \"status\": {\"code\": 0, \"message\": \"ok\"}}"
+    };
+    string user_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "If the User exists, the ID of the User. Else, empty"}];
+    Status status = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Status of the operation."}];
+}
+
+message CreateUserRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			title: "Create User Request"
+			description: "Request to Create a User"
+			required: ["user_name", "password"]
+		}
+		example: "{\"password\": \"drowssap\", \"user_name\": \"myusername\", \"user_age\": 55, \"add_info\": \"Some interesting info\"}"
+	};
+    string user_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Name of the User."}];
+    string password = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Password of the User."}];
+    uint32 user_age = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Age of the User."}];
+    string add_info = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "Some Additional Info of the User."}];
+}
+
+message CreateUserResponse {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"user_id\": \"BpLnfgDsc3WD\", \"status\": {\"code\": 0, \"message\": \"ok\"}}"
+    };
+    string user_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "If the User has been created, the ID of the created User. Else, empty"}];
+    Status status = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Status of the operation."}];
+}
+
+message UpdateUserRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			title: "Update User Request"
+			description: "Request to Update a User"
+			required: ["user_id"]
+		}
+		example: "{\"password\": \"drowssap\", \"user_name\": \"myusername\", \"user_age\": 55, \"add_info\": \"Some interesting info\"}"
+	};
+    User user = 1;
+}
+
+message UpdateUserResponse {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"status\": {\"code\": 0, \"message\": \"ok\"}}"
+    };
+    Status status = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Status of the operation."}];
+}
+
+message GetUserRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			title: "Get User Request"
+			description: "Request to Get the info of a User"
+			required: ["user_id"]
+		}
+	};
+
+    string user_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The ID of the User to be displayed."}];
+}
+
+message GetUserResponse {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"user_id\": \"BpLnfgDsc3WD\", \"user_name\": \"myusername\", \"user_age\": 55, \"add_info\": \"Some interesting info\", \"status\": {\"code\": 0, \"message\": \"ok\"}}"
+    };
+    string user_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The ID of the User."}];
+    string user_name = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Name of the User."}];
+    uint32 user_age = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Age of the User."}];
+    string add_info = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Additional Info of the User."}];
+    Status status = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The Status of the operation."}];
+}
+
+message User {
+    string user_id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The ID of the User to be updated."}];
+    string user_name = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The new Name of the User."}];
+    string password = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The new Password of the User."}];
+    uint32 user_age = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The new Age of the User."}];
+    string add_info = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The new Additional Info of the User."}];
+
+}
